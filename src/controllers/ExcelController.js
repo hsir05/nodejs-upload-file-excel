@@ -1,5 +1,5 @@
 const db = require("../models");
-const Tutorial = db.tutorials;
+const ExcelDB = db.excel; 
 
 const readXlsxFile = require("read-excel-file/node");
 const excel = require("exceljs");
@@ -17,20 +17,20 @@ const upload = async (req, res) => {
       // skip header
       rows.shift();
 
-      let tutorials = [];
+      let excelData = [];
 
       rows.forEach((row) => {
-        let tutorial = {
+        let item = {
           id: row[0],
           title: row[1],
           description: row[2],
           published: row[3],
         };
 
-        tutorials.push(tutorial);
+        excelData.push(item);
       });
 
-      Tutorial.bulkCreate(tutorials)
+      ExcelDB.bulkCreate(excelData)
         .then(() => {
           res.status(200).send({
             message: "Uploaded the file successfully: " + req.file.originalname,
@@ -51,9 +51,8 @@ const upload = async (req, res) => {
   }
 };
 
-const getTutorials = (req, res) => {
-    console.log(55555555);
-  Tutorial.findAll()
+const getExcelData = (req, res) => {
+  ExcelDB.findAll()
     .then((data) => {
       res.send(data);
     })
@@ -66,11 +65,11 @@ const getTutorials = (req, res) => {
 };
 
 const download = (req, res) => {
-  Tutorial.findAll().then((objs) => {
-    let tutorials = [];
+  ExcelDB.findAll().then((objs) => {
+    let excelData = [];
 
     objs.forEach((obj) => {
-      tutorials.push({
+      excelData.push({
         id: obj.id,
         title: obj.title,
         description: obj.description,
@@ -79,7 +78,7 @@ const download = (req, res) => {
     });
 
     let workbook = new excel.Workbook();
-    let worksheet = workbook.addWorksheet("Tutorials");
+    let worksheet = workbook.addWorksheet("ExcelData");
 
     worksheet.columns = [
       { header: "Id", key: "id", width: 5 },
@@ -89,7 +88,7 @@ const download = (req, res) => {
     ];
 
     // Add Array Rows
-    worksheet.addRows(tutorials);
+    worksheet.addRows(excelData);
 
     res.setHeader(
       "Content-Type",
@@ -97,7 +96,7 @@ const download = (req, res) => {
     );
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=" + "tutorials.xlsx"
+      "attachment; filename=" + "zhijianqiu.xlsx"
     );
 
     return workbook.xlsx.write(res).then(function () {
@@ -108,6 +107,6 @@ const download = (req, res) => {
 
 module.exports = {
   upload,
-  getTutorials,
+  getExcelData,
   download,
 };
