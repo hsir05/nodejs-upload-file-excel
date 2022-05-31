@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const excelController = require("../controllers/ExcelCcontroller");
+const excelController = require("../controllers/ExcelController");
 const upload = require("../middlewares/upload");
 
 let routes = (app) => {
